@@ -35,7 +35,7 @@ export const handler = async (event) => {
 
   try {
     const model = ai.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       systemInstruction: ENHANCED_INSTRUCTIONS,
     });
 
@@ -71,7 +71,7 @@ export const handler = async (event) => {
         html: websiteData.html,
         css: websiteData.css,
         js: websiteData.js,
-        preview: generatePreviewURL(websiteData)
+        preview: generatePreviewURL(websiteData.html)
       })
     };
   } catch (error) {

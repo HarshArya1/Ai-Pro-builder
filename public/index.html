@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Website Builder | Create Stunning Websites Instantly</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/style.css">
+    <script src="/assets/script.js" defer></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #0ea5e9;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --light-gray: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(99, 102, 241, 0.3);
+            --gradient-start: #4f46e5;
+            --gradient-end: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            padding: 20px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.1) 0%, transparent 25%);
+            z-index: -1;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-5px, -10px); }
+            50% { transform: translate(10px, 5px); }
+            75% { transform: translate(-7px, 7px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+        }
+
+        .tagline {
+            font-size: 1.4rem;
+            color: var(--light-gray);
+            max-width: 800px;
+            margin: 0 auto 30px;
+            font-weight: 300;
+        }
+
+        .hero-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .feature-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            color: var(--accent);
+            font-size: 1.4rem;
+        }
+
+        .feature-card h3 i {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-section {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 50px 0;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .section-title i {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 1.1rem;
+            color: var(--light);
+            resize: vertical;
+            min-height: 180px;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3);
+        }
+
+        textarea::placeholder {
+            color: var(--light-gray);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 16px 36px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        #generateButton {
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+        }
+
+        #openPreviewButton {
+            background: linear-gradient(135deg, var(--success), #059669);
+            display: none;
+        }
+
+        #downloadButton {
+            background: linear-gradient(135deg, var(--secondary), #7c3aed);
+            display: none;
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            margin: 40px 0;
+            min-height: 120px;
+        }
+
+        .output-section {
+            margin: 50px 0;
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 14px 30px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+        }
+
+        .code-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .code-display {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 30px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.95rem;
+            max-height: 450px;
+            overflow-y: auto;
+            line-height: 1.5;
+            color: #c9d1d9;
+            position: relative;
+        }
+
+        pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-display button.copy-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(56, 139, 253, 0.15);
+            color: #58a6ff;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            border: 1px solid rgba(56, 139, 253, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .code-display button.copy-button:hover {
+            background: rgba(56, 139, 253, 0.25);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .wave-loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            height: 120px;
+        }
+
+        .wave-loader div {
+            width: 14px;
+            height: 50px;
+            background: linear-gradient(to top, var(--primary-light), var(--accent));
+            border-radius: 12px;
+            animation: wave 1.2s infinite ease-in-out;
+        }
+
+        .wave-loader div:nth-child(1) { animation-delay: -0.32s; height: 40px; }
+        .wave-loader div:nth-child(2) { animation-delay: -0.16s; height: 60px; }
+        .wave-loader div:nth-child(3) { animation-delay: 0s; height: 50px; }
+
+        @keyframes wave {
+            0%, 40%, 100% { transform: scaleY(0.6); }
+            20% { transform: scaleY(1); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: var(--success);
+            color: white;
+            padding: 18px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .feature-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--warning), #f97316);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-card {
+                padding: 30px 20px;
+            }
+            
+            .button-group, .action-buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .input-section {
+                padding: 30px 20px;
+            }
+        }
+
+        .token.comment { color: #8b949e; }
+        .token.keyword { color: #ff7b72; }
+        .token.string { color: #a5d6ff; }
+        .token.function { color: #d2a8ff; }
+        .token.tag { color: #7ee787; }
+        .token.attr-name { color: #79c0ff; }
+        .token.attr-value { color: #a5d6ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-magic"></i> AI Website Builder</h1>
+            <p class="tagline">Transform ideas into stunning, functional websites in seconds with cutting-edge AI technology</p>
+        </header>
+
+        <div class="hero-card">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-badge">NEW</div>
+                    <h3><i class="fas fa-bolt"></i> Instant Creation</h3>
+                    <p>Generate complete websites with HTML, CSS, and JavaScript in seconds. No coding required.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-palette"></i> Stunning Designs</h3>
+                    <p>Professional, responsive layouts with modern UI/UX principles that work on any device.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-cloud-download-alt"></i> One-Click Export</h3>
+                    <p>Download your website as a ZIP file or preview instantly in your browser.</p>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <h2 class="section-title"><i class="fas fa-lightbulb"></i> Describe Your Website</h2>
+                <textarea id="userPrompt" placeholder="Example: 'Create a responsive portfolio website with dark theme, animated navigation, hero section with typewriter effect, project grid with hover animations, and contact form...'"></textarea>
+                
+                <div class="button-group">
+                    <button id="generateButton">
+                        <i class="fas fa-wand-magic-sparkles"></i> Generate Website
+                    </button>
+                    <button id="sampleButton">
+                        <i class="fas fa-star"></i> Load Sample
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading-container">
+                <div class="wave-loader" id="loadingSpinner" style="display: none;">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+
+            <div class="output-section" id="outputSection">
+                <h2 class="section-title"><i class="fas fa-code"></i> Generated Code</h2>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="html">HTML</div>
+                    <div class="tab" data-tab="css">CSS</div>
+                    <div class="tab" data-tab="js">JavaScript</div>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-display" id="htmlCodeContainer">
+                        <button class="copy-button" data-target="htmlCode">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <pre id="htmlCode"></pre>
+                    </div>
+                    
+                    <div class="code-display" id="cssCodeContainer" style="display: none;">
+                        <button class="copy-button" data-target="cssCode">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <pre id="cssCode"></pre>
+                    </div>
+                    
+                    <div class="code-display" id="jsCodeContainer" style="display: none;">
+                        <button class="copy-button" data-target="jsCode">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <pre id="jsCode"></pre>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="openPreviewButton">
+                        <i class="fas fa-eye"></i> Preview Website
+                    </button>
+                    <button id="downloadButton">
+                        <i class="fas fa-download"></i> Download Project
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Code copied to clipboard!</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const generateBtn = document.getElementById('generateButton');
+            const sampleBtn = document.getElementById('sampleButton');
+            const previewBtn = document.getElementById('openPreviewButton');
+            const downloadBtn = document.getElementById('downloadButton');
+            const tabs = document.querySelectorAll('.tab');
+            const copyButtons = document.querySelectorAll('.copy-button');
+            const toast = document.getElementById('toast');
+            
+            let currentPreviewUrl = '';
+            let currentProjectData = null;
+
+            // Initialize tooltips
+            copyButtons.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                });
+            });
+
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    document.querySelectorAll('.code-display').forEach(container => {
+                        container.style.display = 'none';
+                    });
+                    
+                    const tabType = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabType}CodeContainer`).style.display = 'block';
+                });
+            });
+
+            // Copy code
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const targetId = e.currentTarget.getAttribute('data-target');
+                    const codeElement = document.getElementById(targetId);
+                    const textToCopy = codeElement.textContent;
+                    
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showToast('Code copied to clipboard!');
+                    }).catch(err => {
+                        showToast('Failed to copy code!');
+                        console.error('Copy error: ', err);
+                    });
+                });
+            });
+
+            // Toast notification
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            // Loading state
+            function showLoading() {
+                document.getElementById('loadingSpinner').style.display = 'flex';
+                document.getElementById('outputSection').style.display = 'none';
+                previewBtn.style.display = 'none';
+                downloadBtn.style.display = 'none';
+            }
+
+            function hideLoading() {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+
+            // Display generated code
+            function displayOutput(html, css, js, previewUrl) {
+                document.getElementById('htmlCode').textContent = html;
+                document.getElementById('cssCode').textContent = css;
+                document.getElementById('jsCode').textContent = js;
+                
+                document.getElementById('outputSection').style.display = 'block';
+                currentPreviewUrl = previewUrl;
+                currentProjectData = { html, css, js };
+                
+                previewBtn.style.display = 'inline-flex';
+                downloadBtn.style.display = 'inline-flex';
+            }
+
+            // Preview generated website
+            previewBtn.addEventListener('click', () => {
+                if (currentPreviewUrl) {
+                    window.open(currentPreviewUrl, '_blank');
+                } else {
+                    showToast('No website available. Please generate first.');
+                }
+            });
+
+            // Download project
+            downloadBtn.addEventListener('click', () => {
+                if (!currentProjectData) {
+                    showToast('No website to download');
+                    return;
+                }
+                
+                const zipContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>AI Generated Website</title>
+                        <style>${currentProjectData.css}</style>
+                    </head>
+                    <body>
+                        ${currentProjectData.html}
+                        <script>${currentProjectData.js}<\/script>
+                    </body>
+                    </html>
+                `;
+                
+                const blob = new Blob([zipContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ai-website.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('Website downloaded!');
+            });
+
+            // Load sample prompt
+            sampleBtn.addEventListener('click', () => {
+                const samplePrompt = "Design a sleek, responsive portfolio website with: " +
+                    "- Dark/light mode toggle " +
+                    "- Animated hero section with typewriter effect " +
+                    "- Project showcase grid with hover animations " +
+                    "- Skills section with progress bars " +
+                    "- Contact form with validation " +
+                    "- Smooth scrolling navigation " +
+                    "- Modern glassmorphism design " +
+                    "- Vibrant color scheme with gradients";
+                    
+                document.getElementById('userPrompt').value = samplePrompt;
+                showToast('Sample prompt loaded!');
+            });
+
+            // Generate website
+            generateBtn.addEventListener('click', generateWebsite);
+            
+            async function generateWebsite() {
+                const prompt = document.getElementById('userPrompt').value.trim();
+                if (!prompt) {
+                    showToast('Please enter a website description');
+                    return;
+                }
+
+                showLoading();
+
+                try {
+                    const response = await fetch('/.netlify/functions/generate-website', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Failed to generate website');
+                    }
+
+                    const data = await response.json();
+                    displayOutput(
+                        data.html, 
+                        data.css, 
+                        data.js, 
+                        data.preview
+                    );
+                    
+                    showToast('Website generated successfully!');
+
+                } catch (error) {
+                    console.error("Generation error:", error);
+                    showToast(`Error: ${error.message}`);
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // Animated background on scroll
+            window.addEventListener('scroll', () => {
+                const yPos = -window.scrollY / 3;
+                document.body.style.backgroundPosition = `center ${yPos}px`;
+            });
+        });
+    </script>
+</body>
+</html>

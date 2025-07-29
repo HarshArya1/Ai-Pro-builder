@@ -73,7 +73,7 @@ export const handler = async (event) => {
         html: websiteData.html,
         css: websiteData.css,
         js: websiteData.js,
-        preview: generatePreviewURL(websiteData.html)
+        preview: generatePreviewURL(websiteData)
       })
     };
   } catch (error) {

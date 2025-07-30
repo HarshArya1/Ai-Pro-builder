@@ -9,3 +9,9 @@
 
 [dev]
   framework = "#static"
+
+[functions]
+  node_bundler = "esbuild"
+  
+[functions.generate-website]
+  timeout = 30  # Increase timeout to 30 seconds

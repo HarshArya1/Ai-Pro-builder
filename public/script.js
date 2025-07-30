@@ -93,61 +93,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Preview functionality
     function openPreview() {
-        if (!currentProjectData) {
-            showToast('No website available. Please generate first.', true);
-            return;
-        }
-
-        try {
-            // Create a complete HTML document with all resources
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>AI Generated Website</title>
-                    <style>
-                        /* Include all necessary CSS */
-                        ${currentProjectData.css}
-                        
-                        /* Responsive fixes */
-                        body, html {
-                            margin: 0;
-                            padding: 0;
-                            overflow-x: hidden;
-                        }
-                        img, video, iframe {
-                            max-width: 100%;
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${currentProjectData.html}
-                    <script>
-                        // Add fallbacks for common errors
-                        try {
-                            ${currentProjectData.js}
-                        } catch (e) {
-                            console.error("Generated JS error:", e);
-                        }
-                    </script>
-                </body>
-                </html>
-            `;
-            
-            // Create a blob and set as iframe source
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            
-            previewFrame.src = url;
-            previewModal.classList.add('visible');
-            
-        } catch (error) {
-            console.error("Preview error:", error);
-            showToast('Failed to open preview. Please try again.', true);
-        }
+    if (!currentProjectData) {
+        showToast('No website available. Please generate first.', true);
+        return;
     }
+
+    try {
+        // Create a complete HTML document with isolated styles
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>AI Generated Website</title>
+                <style>
+                    /* Reset conflicting styles */
+                    * {
+                        box-sizing: border-box;
+                        margin: 0;
+                        padding: 0;
+                        font-family: inherit;
+                    }
+                    
+                    /* Include the generated CSS */
+                    ${currentProjectData.css}
+                    
+                    /* Ensure proper sizing */
+                    html, body {
+                        width: 100%;
+                        height: 100%;
+                        overflow: auto;
+                    }
+                    
+                    /* Center game container */
+                    body {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                        background-color: #282c34;
+                    }
+                </style>
+            </head>
+            <body>
+                ${currentProjectData.html}
+                <script>
+                    // Add the generated JS
+                    ${currentProjectData.js}
+                </script>
+            </body>
+            </html>
+        `;
+        
+        // Create a blob and set as iframe source
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        previewFrame.src = url;
+        previewModal.classList.add('visible');
+        
+    } catch (error) {
+        console.error("Preview error:", error);
+        showToast('Failed to open preview. Please try again.', true);
+    }
+}
 
     // Close preview
     closePreviewBtn.addEventListener('click', () => {

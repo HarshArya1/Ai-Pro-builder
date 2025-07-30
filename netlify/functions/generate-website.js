@@ -19,6 +19,7 @@ Instructions:
 - Use semantic HTML5 elements for better accessibility.
 - Optimize CSS for performance (avoid overly complex selectors).
 - Add comments to explain complex parts of the code.
+- give the code line by line not all code came in one line ok
 
 Important: 
 - The CSS should be a string of CSS rules (without style tags).

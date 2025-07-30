@@ -3,24 +3,25 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const ai = new GoogleGenerativeAI(GOOGLE_API_KEY);
 
+// Enhanced AI agent instructions
 const ENHANCED_INSTRUCTIONS = `
-You are an Pro expert AI agent specializing in automated frontend web development. 
-Generate only the essential HTML, CSS, and JavaScript needed for the requested website.
-The Website must be workable if user say generate a tic tac toe game then the website you generate of that game must work
-must understand the website you made must be a good lokking great impressive Ui 
-you can you react,react-routing,react-redux.
-react-routing to made website multipages,redux for store a entity golobaly in that website,react for add more functionality
-you can use animations for made page more atractive
-must add dark model toogle by your side or give the name of web page if user not gave you or give header section according to user web page
-ex- if suppose user say generate a e-commerse website or not say anything about header you by yourself add login,sign,contact us,Explore etc like according after understand the prompt of user what type website they want to genrate
- 
-Respond with JSON in this exact format:
+You are an expert AI agent specializing in automated frontend web development. Follow this workflow:
+
+<-- CORE MISSION -->
+1. Create complete, functional, and visually stunning websites
+2. Generate HTML, CSS, and JavaScript files
+3. Ensure all features are fully functional
+4. Create responsive designs with modern UI/UX
+5. UI must be Extra Ordinary and colourful so that user must impress to see our create website
+6. Use can you react,react-routind,react-redux for add functionality in web site like using react-routing made multipage website etc functionality
+
+<-- OUTPUT FORMAT -->
+Return JSON with:
 {
-  "html": "<!DOCTYPE html>...",
-  "css": "body { ... }",
-  "js": "function() { ... }"
+  "html": "HTML content",
+  "css": "CSS content",
+  "js": "JavaScript content"
 }
-Keep the response concise and focused on the core functionality.
 `;
 
 export const handler = async (event) => {
@@ -36,71 +37,52 @@ export const handler = async (event) => {
 
   try {
     const model = ai.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
       systemInstruction: ENHANCED_INSTRUCTIONS,
     });
 
-    // Set a timeout for the AI generation
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error('AI generation timed out (8 seconds)'));
-      }, 8000); // 8 second timeout (leaving 2 seconds for processing)
-    });
-
-    const generationPromise = model.generateContent(`
-      USER REQUEST: ${userPrompt}
+    const result = await model.generateContent(`
+      USER PROMPT: ${userPrompt}
       
       Generate a complete website with:
-      - HTML (index.html)
-      - CSS (style.css)
-      - JavaScript (script.js)
+      - HTML file (index.html)
+      - CSS file (style.css)
+      - JavaScript file (script.js)
       
-      Respond ONLY with valid JSON in this format:
+      Output ONLY JSON in this format:
       {
-        "html": "...",
-        "css": "...",
-        "js": "..."
+        "html": "<!DOCTYPE html>...",
+        "css": "body { ... }",
+        "js": "function() { ... }"
       }
     `);
 
-    const result = await Promise.race([generationPromise, timeoutPromise]);
     const response = result.response;
     const text = response.text();
     
-    // Safely extract JSON
-    try {
-      const jsonStart = text.indexOf('{');
-      const jsonEnd = text.lastIndexOf('}') + 1;
-      const jsonString = text.substring(jsonStart, jsonEnd);
-      const websiteData = JSON.parse(jsonString);
+    // Extract JSON from AI response
+    const jsonStart = text.indexOf('{');
+    const jsonEnd = text.lastIndexOf('}') + 1;
+    const jsonString = text.substring(jsonStart, jsonEnd);
+    
+    const websiteData = JSON.parse(jsonString);
 
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          html: websiteData.html,
-          css: websiteData.css,
-          js: websiteData.js,
-          preview: generatePreviewURL(websiteData)
-        })
-      };
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ 
-          error: 'Failed to parse AI response',
-          details: parseError.message
-        })
-      };
-    }
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        html: websiteData.html,
+        css: websiteData.css,
+        js: websiteData.js,
+        preview: generatePreviewURL(websiteData)
+      })
+    };
   } catch (error) {
     console.error("Generation error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ 
         error: 'Website generation failed',
-        details: error.message,
-        suggestion: 'Please try a simpler request or try again later'
+        details: error.message
       })
     };
   }
@@ -121,5 +103,6 @@ function generatePreviewURL(websiteData) {
     </body>
     </html>
   `;
+  
   return `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
 }

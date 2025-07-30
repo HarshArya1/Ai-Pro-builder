@@ -6,6 +6,10 @@ const ai = new GoogleGenerativeAI(GOOGLE_API_KEY);
 const ENHANCED_INSTRUCTIONS = `
 You are an expert AI agent specializing in automated frontend web development. 
 Generate only the essential HTML, CSS, and JavaScript needed for the requested website.
+Give the code line by line not all code came in one line
+Made Webpage Amazing UI so that user just love it, our goal to happy the user by our work
+so just make awesomw fully workable web page and you use react,react routing(for add multipage website functionality),
+react redux for add functionality so that user just love it
 Respond with JSON in this exact format:
 {
   "html": "<!DOCTYPE html>...",

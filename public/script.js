@@ -203,15 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load sample prompt
     sampleBtn.addEventListener('click', () => {
-        const samplePrompt = "Design a responsive portfolio website with: " +
-            "- Dark/light mode toggle " +
-            "- Animated hero section with typewriter effect " +
-            "- Project showcase grid with hover animations " +
-            "- Skills section with progress bars " +
-            "- Contact form with validation " +
-            "- Smooth scrolling navigation " +
-            "- Modern glassmorphism design " +
-            "- Vibrant color scheme with gradients";
+        const samplePrompt = "Create a Tic Tac Toe Game With Great UI";
             
         userPrompt.value = samplePrompt;
         showToast('Sample prompt loaded!');

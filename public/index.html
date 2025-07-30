@@ -614,7 +614,8 @@
             // Preview generated website
             previewBtn.addEventListener('click', () => {
                 if (currentPreviewUrl) {
-                    window.open(currentPreviewUrl, '_blank');
+                    window.open(currentPreviewUrl);
+                    console.log(currentPreviewUrl)
                 } else {
                     showToast('No website available. Please generate first.');
                 }

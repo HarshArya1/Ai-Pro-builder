@@ -1,3 +1,4 @@
+
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
@@ -28,115 +29,144 @@ Important:
 - Add subtle animations for better user experience.
 - Ensure color contrast meets accessibility standards.
 
-Example structure:
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Title</title>
-    <style>/* CSS goes here */</style>
-</head>
-<body>
-    <!-- HTML content -->
-    <script>/* JavaScript goes here */</script>
-</body>
-</html>
+Respond with JSON in this exact format:
+{
+  "html": "<!DOCTYPE html>...",
+  "css": "body { ... }",
+  "js": "function() { ... }"
+}
+
+Key requirements:
+1. HTML must include: <!DOCTYPE html>, <html>, <head> with viewport and charset, and <body>
+2. CSS must be complete and responsive
+3. JavaScript must be functional and concise
+4. Use vanilla JS only - no React or frameworks
+5. Ensure all code is properly escaped for JSON
 `;
 
 export const handler = async (event) => {
-    const body = JSON.parse(event.body);
-    const userPrompt = body.prompt;
+  // Validate request method
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method Not Allowed' })
+    };
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Invalid JSON format' })
+    };
+  }
+
+  const userPrompt = body.prompt;
+  
+  if (!userPrompt) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Prompt is required' })
+    };
+  }
+
+  try {
+    const model = ai.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: ENHANCED_INSTRUCTIONS,
+    });
+
+    // Optimized prompt with strict JSON requirement
+    const optimizedPrompt = `
+      USER REQUEST: ${userPrompt}
+      
+      Generate a complete website with:
+      - HTML (full document structure)
+      - CSS (complete stylesheet)
+      - JavaScript (vanilla JS only)
+      
+      Respond ONLY with valid JSON in this exact format:
+      {
+        "html": "...",
+        "css": "...",
+        "js": "..."
+      }
+      
+      Important: 
+      - Escape all special characters for JSON
+      - Ensure HTML includes doctype and full structure
+      - Keep CSS under 1500 characters
+      - Keep JavaScript under 800 characters
+      - Use only vanilla JavaScript
+    `;
+
+    const result = await model.generateContent(optimizedPrompt);
+    const response = result.response;
+    const text = response.text();
     
-    if (!userPrompt) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: 'Prompt is required' })
-        };
-    }
-
+    // Enhanced JSON extraction
     try {
-        const model = ai.getGenerativeModel({
-            model: "gemini-1.5-flash",
-            systemInstruction: ENHANCED_INSTRUCTIONS,
-        });
+      // Clean the response text
+      const cleanText = text
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
+      
+      // Find JSON boundaries
+      const jsonStart = cleanText.indexOf('{');
+      const jsonEnd = cleanText.lastIndexOf('}') + 1;
+      
+      if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error('No JSON found in AI response');
+      }
+      
+      const jsonString = cleanText.substring(jsonStart, jsonEnd);
+      const websiteData = JSON.parse(jsonString);
 
-        const optimizedPrompt = `
-            USER REQUEST: ${userPrompt}
-            
-            Generate a complete website with:
-            - HTML (must be a full document with doctype, html, head, body)
-            - CSS (only the CSS rules, without <style> tags)
-            - JavaScript (only the JS code, without <script> tags)
-            
-            Respond ONLY with valid JSON in this exact format:
-            {
-                "html": "...",
-                "css": "...",
-                "js": "..."
-            }
-            
-            Important: 
-            - The website must be fully functional and visually appealing.
-            - Use modern CSS (flexbox, grid) for layout.
-            - Include responsive design (mobile first).
-            - Add basic accessibility features (alt text, ARIA roles).
-            - Ensure the website has no errors in the console.
-            - Keep CSS under 2000 characters.
-            - Keep JavaScript under 1000 characters.
-            - Use minimal but functional code.
-        `;
+      // Validate response structure
+      if (!websiteData.html || !websiteData.css) {
+        throw new Error('AI response missing HTML or CSS');
+      }
 
-        const result = await model.generateContent(optimizedPrompt);
-        const response = result.response;
-        const text = response.text();
-        
-        // Safely extract JSON
-        try {
-            // Try to find JSON in the response
-            const jsonStart = text.indexOf('{');
-            const jsonEnd = text.lastIndexOf('}') + 1;
-            
-            if (jsonStart === -1 || jsonEnd === -1) {
-                throw new Error('No JSON found in response');
-            }
-            
-            const jsonString = text.substring(jsonStart, jsonEnd);
-            const websiteData = JSON.parse(jsonString);
+      // Ensure basic HTML structure
+      let finalHTML = websiteData.html;
+      if (!finalHTML.includes('<!DOCTYPE html>')) {
+        finalHTML = `<!DOCTYPE html>\n${finalHTML}`;
+      }
+      if (!finalHTML.includes('<head>')) {
+        finalHTML = finalHTML.replace('<html>', '<html>\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>AI Generated Website</title>\n</head>');
+      }
 
-            // Validate required fields
-            if (!websiteData.html || !websiteData.css) {
-                throw new Error('AI response missing HTML or CSS');
-            }
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    html: websiteData.html,
-                    css: websiteData.css,
-                    js: websiteData.js || ''
-                })
-            };
-        } catch (parseError) {
-            console.error("JSON parse error:", parseError);
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ 
-                    error: 'Failed to parse AI response',
-                    details: parseError.message,
-                    responseText: text
-                })
-            };
-        }
-    } catch (error) {
-        console.error("Generation error:", error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ 
-                error: 'Website generation failed',
-                details: error.message,
-                suggestion: 'Please try a simpler request or try again later'
-            })
-        };
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          html: finalHTML,
+          css: websiteData.css,
+          js: websiteData.js || ''
+        })
+      };
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ 
+          error: 'Failed to parse AI response',
+          details: parseError.message,
+          suggestion: 'Please try a different prompt'
+        })
+      };
     }
+  } catch (error) {
+    console.error("Generation error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ 
+        error: 'Website generation failed',
+        details: error.message,
+        suggestion: 'Please try a simpler request'
+      })
+    };
+  }
 };

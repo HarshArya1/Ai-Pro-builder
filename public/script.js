@@ -228,21 +228,23 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading();
 
         try {
-            const response = await fetch('/.netlify/functions/generate-website', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt })
-            });
+    const response = await fetch('/.netlify/functions/generate-website', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
 
-            if (!response.ok) {
-                let errorData;
-                try {
-                    errorData = await response.json();
-                } catch (e) {
-                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
-                }
-                throw new Error(errorData.error || errorData.details || 'Failed to generate website');
-            }
+    const responseData = await response.json();
+    
+    if (!response.ok) {
+      // Handle server-side errors with more details
+      let errorMessage = `Server error: ${response.status}`;
+      if (responseData.error) errorMessage += ` - ${responseData.error}`;
+      if (responseData.details) errorMessage += ` (${responseData.details})`;
+      if (responseData.suggestion) errorMessage += `. ${responseData.suggestion}`;
+      
+      throw new Error(errorMessage);
+    }
 
             const data = await response.json();
             
@@ -274,6 +276,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Generation error:", error);
+            let errorMessages = error.message;
+    
+    // Simplify API key errors
+            if (errorMessages.includes('API_KEY') || errorMessages.includes('key')) {
+            errorMessages = 'Server configuration issue. Please contact support.';
+            }
+    
+    // Handle timeout errors
+    if (errorMessages.includes('timed out') || errorMessages.includes('504')) {
+      errorMessages = 'Request timed out. Please try a simpler prompt.';
+    }
+    
+    showToast(`Error: ${errorMessages}`, true);
+    retryCount = 0;
+
             
             // Handle JSON parsing errors specifically
             if (error.message.includes('JSON') || error.message.includes('Unexpected token')) {

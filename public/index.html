@@ -536,6 +536,8 @@
             
             let currentPreviewUrl = '';
             let currentProjectData = null;
+            let isGenerating = false;
+            let currentGenerationAttempt = null;
 
             // Initialize tooltips
             copyButtons.forEach(btn => {
@@ -667,44 +669,7 @@
             // Generate website
             generateBtn.addEventListener('click', generateWebsite);
             
-            async function generateWebsite() {
-                const prompt = document.getElementById('userPrompt').value.trim();
-                if (!prompt) {
-                    showToast('Please enter a website description');
-                    return;
-                }
-
-                showLoading();
-
-                try {
-                    const response = await fetch('/.netlify/functions/generate-website', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt })
-                    });
-
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Failed to generate website');
-                    }
-
-                    const data = await response.json();
-                    displayOutput(
-                        data.html, 
-                        data.css, 
-                        data.js, 
-                        data.preview
-                    );
-                    
-                    showToast('Website generated successfully!');
-
-                } catch (error) {
-                    console.error("Generation error:", error);
-                    showToast(`Error: ${error.message}`);
-                } finally {
-                    hideLoading();
-                }
-            }
+            
 
             // Animated background on scroll
             window.addEventListener('scroll', () => {

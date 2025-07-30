@@ -78,7 +78,6 @@ export const handler = async (event) => {
       model: "gemini-2.5-flash",
       systemInstruction: ENHANCED_INSTRUCTIONS,
     });
-
     // Optimized prompt with strict JSON requirement
     const optimizedPrompt = `
       USER REQUEST: ${userPrompt}
@@ -141,33 +140,32 @@ export const handler = async (event) => {
       }
 
       return {
-        statusCode: 200,
-        body: JSON.stringify({
-          html: finalHTML,
-          css: websiteData.css,
-          js: websiteData.js || ''
-        })
-      };
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ 
-          error: 'Failed to parse AI response',
-          details: parseError.message,
-          suggestion: 'Please try a different prompt'
-        })
-      };
+                statusCode: 200,
+                body: JSON.stringify({
+                    html: finalHTML,
+                    css: websiteData.css,
+                    js: websiteData.js || ''
+                })
+            };
+        } catch (error) {
+            console.error("Generation error:", error);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ 
+                    error: 'AI generation failed',
+                    details: error.message,
+                    responseSnippet: text ? text.substring(0, 100) + "..." : "No response"
+                })
+            };
+        }
+    } catch (outerError) {
+        console.error("Handler error:", outerError);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ 
+                error: 'Unexpected server error',
+                details: outerError.message
+            })
+        };
     }
-  } catch (error) {
-    console.error("Generation error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ 
-        error: 'Website generation failed',
-        details: error.message,
-        suggestion: 'Please try a simpler request'
-      })
-    };
-  }
 };

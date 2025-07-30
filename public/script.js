@@ -237,31 +237,44 @@ document.addEventListener('DOMContentLoaded', () => {
         isGenerating = true;
         showLoading();
 
+         try {
+        const response = await fetch('/.netlify/functions/generate-website', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+
+        // Handle empty responses
+        if (!response.body) {
+            throw new Error('Server returned empty response');
+        }
+
+        // Get response text first to handle invalid JSON
+        const responseText = await response.text();
+        
+        if (!responseText) {
+            throw new Error('Server returned empty response');
+        }
+
+        let data;
         try {
-    const response = await fetch('/.netlify/functions/generate-website', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
-    });
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error("JSON parse error:", parseError, "Response text:", responseText);
+            throw new Error('Invalid JSON response from server');
+        }
 
-    const responseData = await response.json();
-    
-    if (!response.ok) {
-      // Handle server-side errors with more details
-      let errorMessage = `Server error: ${response.status}`;
-      if (responseData.error) errorMessage += ` - ${responseData.error}`;
-      if (responseData.details) errorMessage += ` (${responseData.details})`;
-      if (responseData.suggestion) errorMessage += `. ${responseData.suggestion}`;
-      
-      throw new Error(errorMessage);
-    }
+        if (!response.ok) {
+            let errorMessage = `Server error: ${response.status}`;
+            if (data.error) errorMessage += ` - ${data.error}`;
+            if (data.details) errorMessage += ` (${data.details})`;
+            throw new Error(errorMessage);
+        }
 
-            const data = await response.json();
-            
-            // Validate the response
-            if (!data.html || !data.css) {
-                throw new Error('Incomplete website data received from AI');
-            }
+        // Validate the response
+        if (!data.html || !data.css) {
+            throw new Error('Incomplete website data received from AI');
+        }
             
             // Ensure basic HTML structure
             if (!data.html.includes('<html') || !data.html.includes('<head') || !data.html.includes('<body')) {
@@ -301,7 +314,20 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast(`Error: ${errorMessages}`, true);
     retryCount = 0;
 
+            if (error.message.includes('Unexpected end of JSON input') || 
+            error.message.includes('Invalid JSON') || 
+            error.message.includes('empty response')) {
             
+            if (retryCount < MAX_RETRIES) {
+                retryCount++;
+                showRetryNotice();
+                showToast(`Retrying (${retryCount}/${MAX_RETRIES})...`);
+                setTimeout(generateWebsite, 1500);
+                return;
+            } else {
+                showToast('Server returned invalid response. Try a simpler prompt.', true);
+            }
+        }        
             // Handle JSON parsing errors specifically
             if (error.message.includes('JSON') || error.message.includes('Unexpected token')) {
                 if (retryCount < MAX_RETRIES) {

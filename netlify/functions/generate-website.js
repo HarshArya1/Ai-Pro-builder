@@ -3,25 +3,16 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const ai = new GoogleGenerativeAI(GOOGLE_API_KEY);
 
-// Enhanced AI agent instructions
 const ENHANCED_INSTRUCTIONS = `
-You are an expert AI agent specializing in automated frontend web development. Follow this workflow:
-
-<-- CORE MISSION -->
-1. Create complete, functional, and visually stunning websites
-2. Generate HTML, CSS, and JavaScript files
-3. Ensure all features are fully functional
-4. Create responsive designs with modern UI/UX
-5. UI must be Extra Ordinary and colourful so that user must impress to see our create website
-6. Use can you react,react-routind,react-redux for add functionality in web site like using react-routing made multipage website etc functionality
-
-<-- OUTPUT FORMAT -->
-Return JSON with:
+You are an expert AI agent specializing in automated frontend web development. 
+Generate only the essential HTML, CSS, and JavaScript needed for the requested website.
+Respond with JSON in this exact format:
 {
-  "html": "HTML content",
-  "css": "CSS content",
-  "js": "JavaScript content"
+  "html": "<!DOCTYPE html>...",
+  "css": "body { ... }",
+  "js": "function() { ... }"
 }
+Keep the response concise and focused on the core functionality.
 `;
 
 export const handler = async (event) => {
@@ -37,72 +28,77 @@ export const handler = async (event) => {
 
   try {
     const model = ai.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-1.5-flash",
       systemInstruction: ENHANCED_INSTRUCTIONS,
     });
 
-    const result = await model.generateContent(`
-      USER PROMPT: ${userPrompt}
+    // Optimized prompt for faster responses
+    const optimizedPrompt = `
+      USER REQUEST: ${userPrompt}
       
       Generate a complete website with:
-      - HTML file (index.html)
-      - CSS file (style.css)
-      - JavaScript file (script.js)
+      - HTML (index.html)
+      - CSS (style.css)
+      - JavaScript (script.js)
       
-      Output ONLY JSON in this format:
+      Respond ONLY with valid JSON in this format:
       {
-        "html": "<!DOCTYPE html>...",
-        "css": "body { ... }",
-        "js": "function() { ... }"
+        "html": "...",
+        "css": "...",
+        "js": "..."
       }
-    `);
+      
+      Important: 
+      - Keep CSS under 1000 characters
+      - Keep JavaScript under 500 characters
+      - Use minimal but functional code
+      - Avoid large libraries
+    `;
 
+    const result = await model.generateContent(optimizedPrompt);
     const response = result.response;
     const text = response.text();
     
-    // Extract JSON from AI response
-    const jsonStart = text.indexOf('{');
-    const jsonEnd = text.lastIndexOf('}') + 1;
-    const jsonString = text.substring(jsonStart, jsonEnd);
-    
-    const websiteData = JSON.parse(jsonString);
+    // Safely extract JSON with better error handling
+    try {
+      const jsonStart = text.indexOf('{');
+      const jsonEnd = text.lastIndexOf('}') + 1;
+      
+      if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error('No JSON found in response');
+      }
+      
+      const jsonString = text.substring(jsonStart, jsonEnd);
+      const websiteData = JSON.parse(jsonString);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        html: websiteData.html,
-        css: websiteData.css,
-        js: websiteData.js,
-        preview: generatePreviewURL(websiteData)
-      })
-    };
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          html: websiteData.html,
+          css: websiteData.css,
+          js: websiteData.js
+        })
+      };
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ 
+          error: 'Failed to parse AI response',
+          details: parseError.message,
+          responseText: text
+        })
+      };
+    }
   } catch (error) {
     console.error("Generation error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ 
         error: 'Website generation failed',
-        details: error.message
+        details: error.message,
+        suggestion: 'Please try a simpler request or try again later'
       })
     };
   }
 };
-
-function generatePreviewURL(websiteData) {
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <style>${websiteData.css}</style>
-    </head>
-    <body>
-      ${websiteData.html}
-      <script>${websiteData.js}</script>
-    </body>
-    </html>
-  `;
-  
-  return `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
-}

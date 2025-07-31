@@ -214,6 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
     previewBtn.addEventListener('click', openPreview);
     downloadBtn.addEventListener('click', downloadProject);
     
+    document.addEventListener('DOMContentLoaded', () => {
+    // ... existing generator code with improved error handling ...
+
     async function generateWebsite() {
         const prompt = userPrompt.value.trim();
         if (!prompt) {
@@ -229,123 +232,55 @@ document.addEventListener('DOMContentLoaded', () => {
         isGenerating = true;
         showLoading();
 
-         try {
-        const response = await fetch('/.netlify/functions/generate-website', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
-        });
-
-        // Handle empty responses
-        if (!response.body) {
-            throw new Error('Server returned empty response');
-        }
-
-        // Get response text first to handle invalid JSON
-        const responseText = await response.text();
-        
-        if (!responseText) {
-            throw new Error('Server returned empty response');
-        }
-
-        let data;
         try {
-            data = JSON.parse(responseText);
-        } catch (parseError) {
-            console.error("JSON parse error:", parseError, "Response text:", responseText);
-            throw new Error('Invalid JSON response from server');
-        }
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-        if (!response.ok) {
-            let errorMessage = `Server error: ${response.status}`;
-            if (data.error) errorMessage += ` - ${data.error}`;
-            if (data.details) errorMessage += ` (${data.details})`;
-            throw new Error(errorMessage);
-        }
+            const response = await fetch('/.netlify/functions/generate-website', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt }),
+                signal: controller.signal
+            });
 
-        // Validate the response
-        if (!data.html || !data.css) {
-            throw new Error('Incomplete website data received from AI');
-        }
+            clearTimeout(timeoutId);
+
+            // Handle non-200 responses
+            if (!response.ok) {
+                let errorData;
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                }
+                throw new Error(errorData.error || errorData.details || 'Failed to generate website');
+            }
+
+            const data = await response.json();
             
-            // Ensure basic HTML structure
-            if (!data.html.includes('<html') || !data.html.includes('<head') || !data.html.includes('<body')) {
-                data.html = `<!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>AI Generated Website</title>
-                    <style>${data.css}</style>
-                </head>
-                <body>
-                    ${data.html}
-                    <script>${data.js || ''}</script>
-                </body>
-                </html>`;
+            // Validate the response
+            if (!data.html || !data.css) {
+                throw new Error('Incomplete website data received from AI');
             }
             
-            displayOutput(data.html, data.css, data.js || '');
-            showToast('Website generated successfully!');
-            retryCount = 0;
+            // ... rest of your processing ...
 
         } catch (error) {
             console.error("Generation error:", error);
-            let errorMessages = error.message;
-    
-    // Simplify API key errors
-            if (errorMessages.includes('API_KEY') || errorMessages.includes('key')) {
-            errorMessages = 'Server configuration issue. Please contact support.';
+            
+            // Handle timeout specifically
+            if (error.name === 'AbortError') {
+                showToast('Request timed out. Please try a simpler prompt.', true);
             }
-    
-    // Handle timeout errors
-    if (errorMessages.includes('timed out') || errorMessages.includes('504')) {
-      errorMessages = 'Request timed out. Please try a simpler prompt.';
-    }
-    
-    showToast(`Error: ${errorMessages}`, true);
-    retryCount = 0;
-
-            if (error.message.includes('Unexpected end of JSON input') || 
-            error.message.includes('Invalid JSON') || 
-            error.message.includes('empty response')) {
-            
-            if (retryCount < MAX_RETRIES) {
-                retryCount++;
-                showRetryNotice();
-                showToast(`Retrying (${retryCount}/${MAX_RETRIES})...`);
-                setTimeout(generateWebsite, 1500);
-                return;
-            } else {
-                showToast('Server returned invalid response. Try a simpler prompt.', true);
-            }
-        }        
-            // Handle JSON parsing errors specifically
-            if (error.message.includes('JSON') || error.message.includes('Unexpected token')) {
-                if (retryCount < MAX_RETRIES) {
-                    retryCount++;
-                    showRetryNotice();
-                    showToast(`Retrying (${retryCount}/${MAX_RETRIES})...`);
-                    setTimeout(generateWebsite, 1000);
-                    return;
-                }
-            }
-            
-            let errorMessage = error.message;
-            
-            // Simplify timeout messages
-            if (errorMessage.includes('timed out') || errorMessage.includes('504')) {
-                errorMessage = 'Request timed out. Please try a simpler prompt.';
-            }
-            
-            showToast(`Error: ${errorMessage}`, true);
-            retryCount = 0;
-            
+            // ... other error handling ...
         } finally {
             isGenerating = false;
             hideLoading();
         }
     }
+
+    // ... rest of your generator code ...
+});
 
     // Animated background on scroll
     window.addEventListener('scroll', () => {

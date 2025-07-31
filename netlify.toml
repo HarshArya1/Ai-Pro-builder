@@ -7,11 +7,8 @@
   to = "/index.html"
   status = 200
 
-[dev]
-  framework = "#static"
-
 [functions]
   node_bundler = "esbuild"
-  
+
 [functions.generate-website]
-  timeout = 30  # Increase timeout to 30 seconds
+  timeout = 30  # 30 seconds timeout

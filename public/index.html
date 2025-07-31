@@ -10,114 +10,164 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1><i class="fas fa-magic"></i> AI Website Builder</h1>
-            <p class="tagline">Transform ideas into stunning, functional websites in seconds with cutting-edge AI technology</p>
+
+        <header class="hero-header">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <i class="fas fa-magic"></i> 
+                    <span class="title-text">
+                        <span>A</span><span>I</span> 
+                        <span>W</span><span>e</span><span>b</span><span>s</span><span>i</span><span>t</span><span>e</span>
+                        <span>B</span><span>u</span><span>i</span><span>l</span><span>d</span><span>e</span><span>r</span>
+                    </span>
+                </h1>
+                <p class="hero-subtitle">Transform Ideas Into Stunning Websites in Seconds</p>
+                <div class="hero-cta">
+                    <a href="generator.html" class="cta-button">
+                        <i class="fas fa-rocket"></i> Start Building Now
+                    </a>
+                    <a href="#features" class="cta-button secondary">
+                        <i class="fas fa-star"></i> Learn More
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-animation">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+                <div class="shape shape-4"></div>
+            </div>
         </header>
 
-        <div class="hero-card">
+
+        <section id="features" class="features-section">
+            <h2 class="section-title">Why Choose Our AI Website Builder?</h2>
+            
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-badge">NEW</div>
-                    <h3><i class="fas fa-bolt"></i> Instant Creation</h3>
-                    <p>Generate complete websites with HTML, CSS, and JavaScript in seconds. No coding required.</p>
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Lightning Fast</h3>
+                    <p>Generate complete, responsive websites in seconds with cutting-edge AI technology.</p>
                 </div>
+                
                 <div class="feature-card">
-                    <h3><i class="fas fa-palette"></i> Stunning Designs</h3>
-                    <p>Professional, responsive layouts with modern UI/UX principles that work on any device.</p>
+                    <div class="feature-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Stunning Designs</h3>
+                    <p>Professional templates with modern UI/UX principles that work on any device.</p>
                 </div>
+                
                 <div class="feature-card">
-                    <h3><i class="fas fa-cloud-download-alt"></i> One-Click Export</h3>
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Clean Code</h3>
+                    <p>Get production-ready HTML, CSS, and JavaScript with best practices built-in.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </div>
+                    <h3>One-Click Export</h3>
                     <p>Download your website as a ZIP file or preview instantly in your browser.</p>
                 </div>
             </div>
+        </section>
 
-            <div class="input-section">
-                <h2 class="section-title"><i class="fas fa-lightbulb"></i> Describe Your Website</h2>
-                <textarea id="userPrompt" placeholder="Example: 'Create a responsive portfolio website with dark theme, animated navigation, hero section with typewriter effect, project grid with hover animations, and contact form...'"></textarea>
-                
-                <div class="button-group">
-                    <button id="generateButton">
-                        <i class="fas fa-wand-magic-sparkles"></i> Generate Website
-                    </button>
-                    <button id="sampleButton">
-                        <i class="fas fa-star"></i> Load Sample
-                    </button>
-                </div>
-            </div>
 
-            <div class="retry-notice" id="retryNotice">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>Our AI is processing your request. This might take a moment...</span>
-            </div>
-
-            <div class="loading-container">
-                <div class="wave-loader" id="loadingSpinner" style="display: none;">
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                </div>
-            </div>
-
-            <div class="output-section" id="outputSection">
-                <h2 class="section-title"><i class="fas fa-code"></i> Generated Code</h2>
-                
-                <div class="tabs">
-                    <div class="tab active" data-tab="html">HTML</div>
-                    <div class="tab" data-tab="css">CSS</div>
-                    <div class="tab" data-tab="js">JavaScript</div>
+        <section class="how-it-works">
+            <h2 class="section-title">How It Works</h2>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Describe Your Website</h3>
+                    <p>Tell us what you need - portfolio, e-commerce, blog, or anything else.</p>
                 </div>
                 
-                <div class="code-container">
-                    <div class="code-display" id="htmlCodeContainer">
-                        <button class="copy-button" data-target="htmlCode">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                        <pre id="htmlCode"></pre>
-                    </div>
-                    
-                    <div class="code-display" id="cssCodeContainer" style="display: none;">
-                        <button class="copy-button" data-target="cssCode">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                        <pre id="cssCode"></pre>
-                    </div>
-                    
-                    <div class="code-display" id="jsCodeContainer" style="display: none;">
-                        <button class="copy-button" data-target="jsCode">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                        <pre id="jsCode"></pre>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>AI Generates Your Site</h3>
+                    <p>Our advanced AI creates a complete, responsive website.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Customize & Export</h3>
+                    <p>Preview, tweak, and download your website with one click.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="testimonials">
+            <h2 class="section-title">What Our Users Say</h2>
+            
+            <div class="testimonial-cards">
+                <div class="testimonial">
+                    <div class="quote">"This AI builder saved me weeks of development time. The code quality is production-ready!"</div>
+                    <div class="author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <strong>Sarah Johnson</strong>
+                            <span>Web Developer</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="action-buttons">
-                    <button id="openPreviewButton">
-                        <i class="fas fa-eye"></i> Preview Website
-                    </button>
-                    <button id="downloadButton">
-                        <i class="fas fa-download"></i> Download Project
-                    </button>
+                <div class="testimonial">
+                    <div class="quote">"As a small business owner, I created a professional website in minutes with no coding skills."</div>
+                    <div class="author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <strong>Michael Chen</strong>
+                            <span>Business Owner</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <section class="final-cta">
+            <h2>Ready to Create Your Website?</h2>
+            <p>Join thousands of users who have transformed their ideas into reality</p>
+            <a href="generator.html" class="cta-button large">
+                <i class="fas fa-wand-magic-sparkles"></i> Start Building for Free
+            </a>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3><i class="fas fa-magic"></i> AI Website Builder</h3>
+                    <p>Transforming ideas into digital reality</p>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="#">About Us</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact</a>
+                </div>
+                
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 AI Website Builder. All rights reserved.</p>
+            </div>
+        </footer>
     </div>
 
-    <!-- Preview Modal -->
-    <div class="preview-modal" id="previewModal">
-        <div class="preview-header">
-            <div class="preview-title">Website Preview</div>
-            <button id="closePreview">
-                <i class="fas fa-times"></i> Close
-            </button>
-        </div>
-        <div class="preview-content">
-            <iframe id="previewFrame"></iframe>
-        </div>
-    </div>
-
-    <div class="toast" id="toast">Code copied to clipboard!</div>
-    
-    <script src="script.js"></script>
+    <script src="landing.js"></script>
 </body>
 </html>

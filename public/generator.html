@@ -18,16 +18,108 @@
         </header>
 
         <div class="hero-card">
-            <!-- Keep your existing generator content here -->
-            <!-- ... (same as your original generator content) ... -->
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-badge">NEW</div>
+                    <h3><i class="fas fa-bolt"></i> Instant Creation</h3>
+                    <p>Generate complete websites with HTML, CSS, and JavaScript in seconds. No coding required.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-palette"></i> Stunning Designs</h3>
+                    <p>Professional, responsive layouts with modern UI/UX principles that work on any device.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-cloud-download-alt"></i> One-Click Export</h3>
+                    <p>Download your website as a ZIP file or preview instantly in your browser.</p>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <h2 class="section-title"><i class="fas fa-lightbulb"></i> Describe Your Website</h2>
+                <textarea id="userPrompt" placeholder="Example: 'Create a responsive portfolio website with dark theme, animated navigation, hero section with typewriter effect, project grid with hover animations, and contact form...'"></textarea>
+                
+                <div class="button-group">
+                    <button id="generateButton">
+                        <i class="fas fa-wand-magic-sparkles"></i> Generate Website
+                    </button>
+                    <button id="sampleButton">
+                        <i class="fas fa-star"></i> Load Sample
+                    </button>
+                </div>
+            </div>
+
+            <div class="retry-notice" id="retryNotice">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Our AI is processing your request. This might take a moment...</span>
+            </div>
+
+            <div class="loading-container">
+                <div class="wave-loader" id="loadingSpinner" style="display: none;">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+
+            <div class="output-section" id="outputSection">
+                <h2 class="section-title"><i class="fas fa-code"></i> Generated Code</h2>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="html">HTML</div>
+                    <div class="tab" data-tab="css">CSS</div>
+                    <div class="tab" data-tab="js">JavaScript</div>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-display" id="htmlCodeContainer">
+                        <button class="copy-button" data-target="htmlCode">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <pre id="htmlCode"></pre>
+                    </div>
+                    
+                    <div class="code-display" id="cssCodeContainer" style="display: none;">
+                        <button class="copy-button" data-target="cssCode">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <pre id="cssCode"></pre>
+                    </div>
+                    
+                    <div class="code-display" id="jsCodeContainer" style="display: none;">
+                        <button class="copy-button" data-target="jsCode">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <pre id="jsCode"></pre>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="openPreviewButton">
+                        <i class="fas fa-eye"></i> Preview Website
+                    </button>
+                    <button id="downloadButton">
+                        <i class="fas fa-download"></i> Download Project
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Preview Modal -->
-    <!-- ... (same as your original preview modal) ... -->
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-header">
+            <div class="preview-title">Website Preview</div>
+            <button id="closePreview">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+        <div class="preview-content">
+            <iframe id="previewFrame"></iframe>
+        </div>
+    </div>
 
     <div class="toast" id="toast">Code copied to clipboard!</div>
-
+    
     <script src="script.js"></script>
 </body>
 </html>

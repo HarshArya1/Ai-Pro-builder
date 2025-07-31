@@ -93,71 +93,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Preview functionality
     function openPreview() {
-    if (!currentProjectData) {
-        showToast('No website available. Please generate first.', true);
-        return;
-    }
+        if (!currentProjectData) {
+            showToast('No website available. Please generate first.', true);
+            return;
+        }
 
-    try {
-        // Create a complete HTML document with isolated styles
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>AI Generated Website</title>
-                <style>
-                    /* Reset conflicting styles */
-                    * {
-                        box-sizing: border-box;
-                        margin: 0;
-                        padding: 0;
-                        font-family: inherit;
-                    }
-                    
-                    /* Include the generated CSS */
-                    ${currentProjectData.css}
-                    
-                    /* Ensure proper sizing */
-                    html, body {
-                        width: 100%;
-                        height: 100%;
-                        overflow: auto;
-                    }
-                    
-                    /* Center game container */
-                    body {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        min-height: 100vh;
-                        background-color: #282c34;
-                    }
-                </style>
-            </head>
-            <body>
-                ${currentProjectData.html}
-                <script>
-                    // Add the generated JS
-                    ${currentProjectData.js}
-                </script>
-            </body>
-            </html>
-        `;
-        
-        // Create a blob and set as iframe source
-        const blob = new Blob([htmlContent], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        
-        previewFrame.src = url;
-        previewModal.classList.add('visible');
-        
-    } catch (error) {
-        console.error("Preview error:", error);
-        showToast('Failed to open preview. Please try again.', true);
+        try {
+            // Create a complete HTML document with isolated styles
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>AI Generated Website</title>
+                    <style>
+                        /* Reset conflicting styles */
+                        * {
+                            box-sizing: border-box;
+                            margin: 0;
+                            padding: 0;
+                            font-family: inherit;
+                        }
+                        
+                        /* Include the generated CSS */
+                        ${currentProjectData.css}
+                        
+                        /* Ensure proper sizing */
+                        html, body {
+                            width: 100%;
+                            height: 100%;
+                            overflow: auto;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${currentProjectData.html}
+                    <script>
+                        // Add the generated JS
+                        ${currentProjectData.js}
+                    </script>
+                </body>
+                </html>
+            `;
+            
+            // Create a blob and set as iframe source
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            previewFrame.src = url;
+            previewModal.classList.add('visible');
+            
+        } catch (error) {
+            console.error("Preview error:", error);
+            showToast('Failed to open preview. Please try again.', true);
+        }
     }
-}
 
     // Close preview
     closePreviewBtn.addEventListener('click', () => {
@@ -203,7 +194,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load sample prompt
     sampleBtn.addEventListener('click', () => {
-        const samplePrompt = "Create a Tic Tac Toe Game With Great UI";
+        const samplePrompt = "Design a responsive portfolio website with: " +
+            "- Dark/light mode toggle " +
+            "- Animated hero section with typewriter effect " +
+            "- Project showcase grid with hover animations " +
+            "- Skills section with progress bars " +
+            "- Contact form with validation " +
+            "- Smooth scrolling navigation " +
+            "- Modern glassmorphism design " +
+            "- Vibrant color scheme with gradients";
             
         userPrompt.value = samplePrompt;
         showToast('Sample prompt loaded!');
@@ -214,9 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
     previewBtn.addEventListener('click', openPreview);
     downloadBtn.addEventListener('click', downloadProject);
     
-    document.addEventListener('DOMContentLoaded', () => {
-    // ... existing generator code with improved error handling ...
-
     async function generateWebsite() {
         const prompt = userPrompt.value.trim();
         if (!prompt) {
@@ -233,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading();
 
         try {
+            // Add timeout handling
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
@@ -245,25 +242,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
             clearTimeout(timeoutId);
 
-            // Handle non-200 responses
-            if (!response.ok) {
-                let errorData;
-                try {
-                    errorData = await response.json();
-                } catch (e) {
-                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
-                }
-                throw new Error(errorData.error || errorData.details || 'Failed to generate website');
+            // Get response text first to handle invalid JSON
+            const responseText = await response.text();
+            
+            if (!responseText) {
+                throw new Error('Server returned empty response');
             }
 
-            const data = await response.json();
-            
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error("JSON parse error:", parseError, "Response text:", responseText);
+                throw new Error('Invalid JSON response from server');
+            }
+
+            if (!response.ok) {
+                let errorMessage = `Server error: ${response.status}`;
+                if (data.error) errorMessage += ` - ${data.error}`;
+                if (data.details) errorMessage += ` (${data.details})`;
+                throw new Error(errorMessage);
+            }
+
             // Validate the response
             if (!data.html || !data.css) {
                 throw new Error('Incomplete website data received from AI');
             }
             
-            // ... rest of your processing ...
+            displayOutput(data.html, data.css, data.js || '');
+            showToast('Website generated successfully!');
+            retryCount = 0;
 
         } catch (error) {
             console.error("Generation error:", error);
@@ -271,16 +279,38 @@ document.addEventListener('DOMContentLoaded', () => {
             // Handle timeout specifically
             if (error.name === 'AbortError') {
                 showToast('Request timed out. Please try a simpler prompt.', true);
+            } 
+            // Handle JSON parsing errors specifically
+            else if (error.message.includes('Unexpected end of JSON input') || 
+                     error.message.includes('Invalid JSON') || 
+                     error.message.includes('empty response')) {
+                
+                if (retryCount < MAX_RETRIES) {
+                    retryCount++;
+                    showRetryNotice();
+                    showToast(`Retrying (${retryCount}/${MAX_RETRIES})...`);
+                    setTimeout(generateWebsite, 1500);
+                    return;
+                } else {
+                    showToast('Server returned invalid response. Try a simpler prompt.', true);
+                }
+            } else {
+                let errorMessage = error.message;
+                
+                // Simplify API key errors
+                if (errorMessage.includes('API_KEY') || errorMessage.includes('key')) {
+                    errorMessage = 'Server configuration issue. Please contact support.';
+                }
+                
+                showToast(`Error: ${errorMessage}`, true);
             }
-            // ... other error handling ...
+            retryCount = 0;
+            
         } finally {
             isGenerating = false;
             hideLoading();
         }
     }
-
-    // ... rest of your generator code ...
-});
 
     // Animated background on scroll
     window.addEventListener('scroll', () => {
